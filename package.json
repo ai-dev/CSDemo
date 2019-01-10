@@ -1,0 +1,27 @@
+{
+  "name": "csdemo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "nodemon dist",
+    "start": "node dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ai-dev/CSDemo.git"
+  },
+  "author": "Angelo Iasevoli",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ai-dev/CSDemo/issues"
+  },
+  "homepage": "https://github.com/ai-dev/CSDemo#readme",
+  "dependencies": {
+    "@types/node": "^10.12.18",
+    "hapi": "^17.8.1",
+    "typescript": "^3.2.2"
+  }
+}
