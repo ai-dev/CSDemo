@@ -3,7 +3,7 @@ import * as Hapi from 'hapi';
 import * as apiController from './controllers/apiController';
 
 const server = new Hapi.Server({
-    port: 3000,
+    port: 5000,
     host: 'localhost'
 });
 
