@@ -1,28 +1,125 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
+import React, {Component} from 'react';
+import styled, {css} from 'styled-components';
+import { Todo }  from '../../src/types/Todo';
 import './App.css';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.tsx</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+interface IPropsButton {
+    primary?: boolean;
+    disabled?: boolean;
+}
+
+const Button = styled.button<IPropsButton>`
+    background: transparent;
+    border-radius: 3px;
+    border: 2px solid palevioletred;
+    color: palevioletred;
+    margin: 0.5em 1em;
+    padding: 0.25em 1em;
+
+    ${props => props.primary && css`
+        background: palevioletred;
+        color: white;
+    `}
+    
+    ${props => props.disabled && css`
+        background: grey;
+        border: grey;
+        color: white;
+    `}
+    
+`;
+
+
+const Input = styled.input`
+    padding: 0.5em;
+    margin: 0.5em;
+`;
+
+interface State {
+    todos: Todo[],
+    newTodo: string,
+}
+
+class App extends Component<{}, State> {
+
+    constructor(props: {}) {
+        super(props);
+        this.state = {
+            todos: [],
+            newTodo: '',
+        };
+    }
+
+    componentDidMount() {
+        this.getTodos()
+            .then(res => this.setState({todos: res}))
+            .catch(err => console.log(err));
+    }
+
+    getTodos = async () : Promise<Todo[]>=> {
+        const response = await fetch('/api/todo');
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        return body;
+    };
+
+    saveTodo = async (text: string) : Promise<Todo>=> {
+        const response = await fetch('/api/todo', {
+            method: 'post',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ text }),
+        });
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        return body;
+    };
+
+    updateStatusTodo = async (index: number, done: boolean) : Promise<Todo>=> {
+        const response = await fetch(`/api/todo/${index}`, {
+            method: 'put',
+            headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ done }),
+        });
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
+        return body;
+    };
+
+    onItemAdd = async () => {
+        if (this.state.newTodo.length === 0) {
+            return;
+        }
+
+        const newTodo = await this.saveTodo(this.state.newTodo);
+        this.setState({ todos: [...this.state.todos, newTodo], newTodo: ''});
+    };
+
+    onStatusChange = async (index: number, done: boolean) => {
+        const updatedTodo = await this.updateStatusTodo(index, done);
+        let todos = [...this.state.todos];
+        todos[index] = updatedTodo;
+        this.setState({todos});
+    };
+
+    render() {
+        return (
+            <div className="App">
+                <header className="App-header">
+                    <Input value={this.state.newTodo} onChange={e => this.setState({newTodo: e.target.value})}/>
+                    <Button primary onClick={this.onItemAdd} disabled={this.state.newTodo.length === 0}>Add Todo Item</Button>
+                    <div>
+                        <ol>
+                            {this.state.todos.map((todo, i) => {
+                                return <li key={i}>
+                                    {todo.text} <input type="checkbox" checked={todo.done} onChange={e => this.onStatusChange(i, e.target.checked)}/>
+                                </li>
+                            })}
+                        </ol>
+                    </div>
+                </header>
+            </div>
+        );
+    }
 }
 
 export default App;

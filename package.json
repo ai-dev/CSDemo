@@ -5,8 +5,9 @@
   "main": "server.ts",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch & nodemon dist/server.js",
-    "start": "node dist/server.js",
+    "client": "cd client && npm start",
+    "server": "tsc --watch & nodemon dist/server.js",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
     "test": "mocha -r ts-node/register test/*.test.ts"
   },
   "repository": {
@@ -29,6 +30,7 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.5",
     "chai": "^4.2.0",
+    "concurrently": "^4.1.0",
     "mocha": "^5.2.0",
     "ts-node": "^7.0.1"
   }
