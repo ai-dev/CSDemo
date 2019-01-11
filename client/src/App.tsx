@@ -50,11 +50,14 @@ class App extends Component<{}, State> {
         };
     }
 
-    componentDidMount() {
-        this.getTodos()
-            .then(res => this.setState({todos: res}))
-            .catch(err => console.log(err));
-    }
+    async componentDidMount() {
+        try {
+            const todos = await this.getTodos();
+            this.setState({ todos });
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     getTodos = async () : Promise<Todo[]>=> {
         const response = await fetch('/api/todo');
